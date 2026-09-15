@@ -1,5 +1,6 @@
 /* IG užuolaidų salonas — judesys: užuolaidos atsiveria (GSAP laiko juosta), roletas leidžiasi pagal slinkimą
-   (ScrollTrigger scrub su išlyginimu), paslaugų langas keičia būsenas be trūkčiojimų (tween iš esamos padėties).
+   (ScrollTrigger scrub su išlyginimu), paslaugų langas keičia būsenas be trūkčiojimų (tween iš esamos padėties),
+   pats pereina per paslaugas, kol lankytojas nespustelėjo; nuotraukų peržiūra su priartinimu.
    Be GSAP arba su prefers-reduced-motion viskas lieka CSS: perėjimai arba iškart galutinė būsena. */
 (function () {
   'use strict';
@@ -12,15 +13,22 @@
   var q = function (s, r) { return (r || document).querySelector(s); };
   var qa = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
 
+  /* Žiedų poslinkis: žiedai kabo ant klosčių viršūnių; suspaudus audinį iki s jie susislenka į krūvelę prie
+     išorinio krašto, bet ne arčiau nei 60 % žiedo skersmens vienas nuo kito – tada krūvelė lieka tvarkinga. */
+  function ringShift(rings, side, s) {
+    var box = rings[0].parentNode, W = box.clientWidth || 1, n = rings.length, period = 1 / n;
+    var gap = Math.max(s * period, 0.6 * rings[0].offsetWidth / W);
+    return function (i) {
+      var r = rings[i], c = (r.offsetLeft + r.offsetWidth / 2) / W;
+      if (side === 'r') c = 1 - c;
+      return (side === 'l' ? 1 : -1) * c * W * (gap / period - 1);
+    };
+  }
+
   /* ---------- 1. Užuolaidos atsiveria ---------- */
   var hero = q('.hero');
   var gather = parseFloat(getComputedStyle(html).getPropertyValue('--gather')) || 0.09;
   var opened = false;
-
-  function heroRingX(side, s) {           /* žiedo poslinkis, kai skydas suspaustas iki s */
-    var hw = hero.clientWidth, dir = side === 'l' ? 1 : -1;
-    return function (i) { return dir * i * hw * 0.0625 * (s - 1); };
-  }
 
   function openCurtains() {
     if (opened) return;
@@ -43,19 +51,19 @@
       window.addEventListener('resize', function () {              /* žiedai laikomi px – perskaičiuojame keičiant plotį */
         if (hero.clientWidth === lastW) return;
         lastW = hero.clientWidth;
-        G.set(rl, { x: heroRingX('l', gather) });
-        G.set(rr, { x: heroRingX('r', gather) });
+        G.set(rl, { x: ringShift(rl, 'l', gather) });
+        G.set(rr, { x: ringShift(rr, 'r', gather) });
       });
     } });
     tl.to('.rod .glint', { xPercent: 240, duration: 1.3, ease: 'power2.inOut' }, 0)
       .to('.shade', { opacity: 0, duration: 0.7, ease: 'power2.out' }, 0.05)
       .set('.shade', { visibility: 'hidden' })
       .to(panels, { scaleX: mid, duration: 1.35 }, 0.15)
-      .to(rl, { x: heroRingX('l', mid), duration: 1.35, stagger: { each: 0.02, from: 'end' } }, 0.15)
-      .to(rr, { x: heroRingX('r', mid), duration: 1.35, stagger: { each: 0.02, from: 'end' } }, 0.15)
+      .to(rl, { x: ringShift(rl, 'l', mid), duration: 1.35, stagger: { each: 0.025, from: 'end' } }, 0.15)
+      .to(rr, { x: ringShift(rr, 'r', mid), duration: 1.35, stagger: { each: 0.025, from: 'end' } }, 0.15)
       .to(panels, { scaleX: gather, duration: 0.45, ease: 'power2.out' }, 1.5)
-      .to(rl, { x: heroRingX('l', gather), duration: 0.45, ease: 'power2.out' }, 1.5)
-      .to(rr, { x: heroRingX('r', gather), duration: 0.45, ease: 'power2.out' }, 1.5)
+      .to(rl, { x: ringShift(rl, 'l', gather), duration: 0.45, ease: 'power2.out' }, 1.5)
+      .to(rr, { x: ringShift(rr, 'r', gather), duration: 0.45, ease: 'power2.out' }, 1.5)
       .to('.hero .glow', { scale: 1, opacity: 1, duration: 1.4, ease: 'power2.out' }, 0.4)
       .to('.hero-copy', { y: 0, opacity: 1, duration: 0.8, ease: 'power2.out' }, 0.75)
       .to('.sunpatch', { opacity: 0.8, duration: 1, ease: 'power2.out' }, 0.9);
@@ -124,11 +132,6 @@
     G.set(E.mosq, { x: 70, y: -46, rotation: -20, autoAlpha: 0 });
   }
 
-  function demoRingX(side, s) {
-    var w = E.stage.clientWidth, dir = side === 'l' ? 1 : -1;
-    return function (i) { return dir * i * w * 0.0792 * (s - 1); };
-  }
-
   function applyState(s) {
     if (!E) collect();
     if (cycle) { cycle.kill(); cycle = null; }
@@ -166,8 +169,8 @@
       tl.to(E.rings, { autoAlpha: 0, y: -40, duration: 0.35, ease: 'power2.in' }, 0);
       tl.to(E.rod, { xPercent: -125, duration: 0.5, ease: 'power2.in' }, 0);
       tl.to(E.brackets, { autoAlpha: 0, duration: 0.3 }, 0);
-      tl.set(E.rl, { x: demoRingX('l', 0.72) }, 0.5);
-      tl.set(E.rr, { x: demoRingX('r', 0.72) }, 0.5);
+      tl.set(E.rl, { x: ringShift(E.rl, 'l', 0.72) }, 0.5);
+      tl.set(E.rr, { x: ringShift(E.rr, 'r', 0.72) }, 0.5);
       tl.to(E.rod, { xPercent: 0, duration: 0.95, ease: 'power3.inOut' }, 0.55);
       tl.to(E.brackets, { autoAlpha: 1, duration: 0.4, ease: 'power2.out' }, 1.35);
       tl.to(E.rings, { y: 0, autoAlpha: 1, duration: 0.6, ease: 'back.out(1.7)', stagger: 0.05 }, 1.45);
@@ -175,8 +178,8 @@
       rest(0);
     } else {
       tl.to(E.drapes, { scaleX: ds, scaleY: 1, autoAlpha: 1, duration: d }, 0);
-      tl.to(E.rl, { x: demoRingX('l', ds), y: 0, autoAlpha: 1, duration: d }, 0);
-      tl.to(E.rr, { x: demoRingX('r', ds), y: 0, autoAlpha: 1, duration: d }, 0);
+      tl.to(E.rl, { x: ringShift(E.rl, 'l', ds), y: 0, autoAlpha: 1, duration: d }, 0);
+      tl.to(E.rr, { x: ringShift(E.rr, 'r', ds), y: 0, autoAlpha: 1, duration: d }, 0);
       tl.to(E.rod, { xPercent: 0, duration: 0.6 }, 0);
       tl.to(E.brackets, { autoAlpha: 1, duration: 0.3 }, 0);
       rest(0);
@@ -234,14 +237,34 @@
     moveMarker(tabs[i]);
   }
 
+  /* Savaiminis peržiūros ciklas: kol lankytojas nieko nespustelėjo ir skiltis matoma, langas pats pereina per paslaugas */
+  var tourTimer = null, interacted = false, sectionVisible = false;
+  function stopTour() { interacted = true; clearTimeout(tourTimer); tourTimer = null; }
+  function scheduleTour(delay) {
+    clearTimeout(tourTimer);
+    if (interacted || !sectionVisible || reduce || document.hidden) return;
+    tourTimer = setTimeout(function () {
+      select((current + 1) % tabs.length, false);
+      scheduleTour(5200);
+    }, delay);
+  }
+  var paslaugos = q('#paslaugos');
+  if (paslaugos && tabs.length && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      sectionVisible = entries[0].isIntersecting;
+      if (sectionVisible) scheduleTour(3200); else clearTimeout(tourTimer);
+    }, { threshold: 0.45 }).observe(paslaugos);
+    document.addEventListener('visibilitychange', function () { if (document.hidden) clearTimeout(tourTimer); else scheduleTour(2500); });
+  }
+
   tabs.forEach(function (b, i) {
-    b.addEventListener('click', function () { select(i, false); });
+    b.addEventListener('click', function () { stopTour(); select(i, false); });
     b.addEventListener('keydown', function (e) {
       var k = e.key;
-      if (k === 'ArrowDown' || k === 'ArrowRight') { e.preventDefault(); select((i + 1) % tabs.length, true); }
-      else if (k === 'ArrowUp' || k === 'ArrowLeft') { e.preventDefault(); select((i - 1 + tabs.length) % tabs.length, true); }
-      else if (k === 'Home') { e.preventDefault(); select(0, true); }
-      else if (k === 'End') { e.preventDefault(); select(tabs.length - 1, true); }
+      if (k === 'ArrowDown' || k === 'ArrowRight') { e.preventDefault(); stopTour(); select((i + 1) % tabs.length, true); }
+      else if (k === 'ArrowUp' || k === 'ArrowLeft') { e.preventDefault(); stopTour(); select((i - 1 + tabs.length) % tabs.length, true); }
+      else if (k === 'Home') { e.preventDefault(); stopTour(); select(0, true); }
+      else if (k === 'End') { e.preventDefault(); stopTour(); select(tabs.length - 1, true); }
     });
   });
   if (tabs.length) {
@@ -255,13 +278,77 @@
       clearTimeout(rt);
       rt = setTimeout(function () {
         var ds = DS[+tabs[current].getAttribute('data-s')];
-        G.set(E.rl, { x: demoRingX('l', ds) });
-        G.set(E.rr, { x: demoRingX('r', ds) });
+        G.set(E.rl, { x: ringShift(E.rl, 'l', ds) });
+        G.set(E.rr, { x: ringShift(E.rr, 'r', ds) });
       }, 150);
     });
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { moveMarker(tabs[current]); });
   }
 
+  /* ---------- 4. Nuotraukų peržiūra su priartinimu ---------- */
+  var lb = q('#lb'), links = qa('.gal-link');
+  if (lb && links.length && typeof lb.showModal === 'function') {
+    var lbImg = q('#lb-img'), lbFig = q('#lb-fig'), lbCap = q('#lb-cap'), lbCount = q('#lb-count'), lbHint = q('#lb-hint');
+    var idx = 0, zoomed = false, lastFocus = null;
+    function unzoom() {
+      zoomed = false;
+      lbFig.classList.remove('zoomed');
+      lbFig.style.width = lbFig.style.height = '';
+      lbImg.style.width = lbImg.style.height = '';
+      lbHint.textContent = 'Spustelėkite nuotrauką, kad priartintumėte';
+    }
+    function show(i) {
+      idx = (i + links.length) % links.length;
+      unzoom();
+      var a = links[idx], img = q('img', a), fc = q('figcaption', a.parentNode);
+      lbImg.src = a.getAttribute('href');
+      lbImg.alt = img ? img.alt : '';
+      lbCap.textContent = fc ? fc.textContent : '';
+      lbCount.textContent = (idx + 1) + ' / ' + links.length;
+    }
+    function open(i) {
+      lastFocus = document.activeElement;
+      show(i);
+      html.classList.add('lb-open');
+      lb.showModal();
+      q('.lb-close', lb).focus();
+    }
+    function toggleZoom() {
+      if (zoomed) { unzoom(); return; }
+      var w = lbImg.clientWidth, h = lbImg.clientHeight;
+      if (!w || !h) return;
+      zoomed = true;
+      lbFig.style.width = w + 'px';
+      lbFig.style.height = h + 'px';
+      lbFig.classList.add('zoomed');
+      lbImg.style.width = Math.round(w * 2) + 'px';
+      lbImg.style.height = Math.round(h * 2) + 'px';
+      lbFig.scrollLeft = Math.round(w / 2);
+      lbFig.scrollTop = Math.round(h / 2);
+      lbHint.textContent = 'Slinkite, kad pamatytumėte detales; spustelėkite dar kartą, kad sumažintumėte';
+    }
+    links.forEach(function (a, i) { a.addEventListener('click', function (e) { e.preventDefault(); open(i); }); });
+    lb.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-lb]');
+      if (btn) {
+        var act = btn.getAttribute('data-lb');
+        if (act === 'close') lb.close(); else if (act === 'prev') show(idx - 1); else show(idx + 1);
+        return;
+      }
+      if (e.target === lbImg) { toggleZoom(); return; }
+      if (e.target === lb) lb.close();                         /* fonas */
+    });
+    lb.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { e.preventDefault(); show(idx + 1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); show(idx - 1); }
+    });
+    lb.addEventListener('close', function () {
+      html.classList.remove('lb-open');
+      unzoom();
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    });
+  }
+
   /* API tikrinimui */
-  window.IG = { select: select, gsap: useG, state: function () { return demo ? demo.className : ''; } };
+  window.IG = { select: select, gsap: useG, state: function () { return demo ? demo.className : ''; }, tourActive: function () { return !interacted && !!tourTimer; } };
 })();
