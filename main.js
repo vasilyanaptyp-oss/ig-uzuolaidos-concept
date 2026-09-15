@@ -45,13 +45,13 @@
     gather = gatherFor(panels[0].offsetWidth, rl);
     html.style.setProperty('--gather', gather.toFixed(4));
   }
-  var opened = false;
+  var opened = false, heroDone = false;
 
   function openCurtains() {
     if (opened) return;
     opened = true;
-    if (!html.classList.contains('veil')) return;
-    if (!useG) { html.classList.remove('veil'); return; }   /* CSS perėjimai */
+    if (!html.classList.contains('veil')) { heroDone = true; return; }
+    if (!useG) { html.classList.remove('veil'); setTimeout(function () { heroDone = true; }, 1700); return; }   /* CSS perėjimai */
     G.set(panels, { scaleX: 1 });
     G.set(rl.concat(rr), { x: 0 });
     G.set('.shade', { opacity: 0.45, visibility: 'visible' });
@@ -61,6 +61,7 @@
     html.classList.remove('veil');                          /* inline reikšmės laiko uždarytą būseną */
     var mid = gather * 0.82;
     var tl = G.timeline({ defaults: { ease: 'power3.inOut' }, onComplete: function () {
+      heroDone = true;
       G.set(panels, { clearProps: 'transform' });                 /* skydai toliau pagal CSS (--gather) */
       G.to('.hero .glow', { x: '-8%', y: '10%', duration: 16, yoyo: true, repeat: -1, ease: 'sine.inOut' });
     } });
@@ -254,19 +255,25 @@
     moveMarker(tabs[i]);
   }
 
-  /* Plačiame ekrane skiltis prisegama: slenkant langas pats keičia paslaugas (po ~380 px kiekvienai) */
+  /* Plačiame ekrane langas su sąrašu prisegamas ekrano viduryje: slenkant paslaugos keičiasi pačios,
+     kiekvienai ~0,72 ekrano aukščio, su prisitraukimu prie paslaugos vidurio – neįmanoma netyčia peršokti */
   var PER = 380, scrollMode = null;
   var paslaugos = q('#paslaugos');
-  if (useG && ST && paslaugos && tabs.length) {
+  if (useG && ST && paslaugos && tabs.length && demo) {
     G.matchMedia().add('(min-width: 900px)', function () {
+      var n = tabs.length;
+      PER = Math.round(Math.min(800, Math.max(520, window.innerHeight * 0.72)));
+      var snaps = [];
+      for (var k = 0; k < n; k++) snaps.push((k + 0.5) / n);
       scrollMode = ST.create({
-        trigger: paslaugos,
-        start: function () { return 'top ' + Math.max(64, Math.round((window.innerHeight - paslaugos.offsetHeight) / 2)) + 'px'; },
-        end: '+=' + (PER * tabs.length),
+        trigger: demo,
+        start: function () { return 'top ' + Math.max(72, Math.round((window.innerHeight - demo.offsetHeight) / 2)) + 'px'; },
+        end: '+=' + (PER * n),
         pin: true,
         anticipatePin: 1,
+        snap: { snapTo: snaps, duration: { min: 0.15, max: 0.45 }, delay: 0.08, ease: 'power1.inOut' },
         onUpdate: function (self) {
-          var idx = Math.min(tabs.length - 1, Math.floor(self.progress * tabs.length + 0.0001));
+          var idx = Math.min(n - 1, Math.floor(self.progress * n + 0.0001));
           if (idx !== current) select(idx, false);
         }
       });
@@ -299,7 +306,7 @@
     if (scrollMode) {
       var prev = html.style.scrollBehavior;
       html.style.scrollBehavior = 'auto';
-      window.scrollTo(0, Math.round(scrollMode.start + i * PER + 4));
+      window.scrollTo(0, Math.round(scrollMode.start + (i + 0.5) * PER));
       html.style.scrollBehavior = prev;
     }
     select(i, focus);
@@ -383,5 +390,5 @@
   }
 
   /* API tikrinimui */
-  window.IG = { select: select, gsap: useG, state: function () { return demo ? demo.className : ''; }, tourActive: function () { return !interacted && !!tourTimer; }, scrollMode: function () { return !!scrollMode; }, gather: function () { return gather; } };
+  window.IG = { select: select, gsap: useG, heroDone: function () { return heroDone; }, state: function () { return demo ? demo.className : ''; }, tourActive: function () { return !interacted && !!tourTimer; }, scrollMode: function () { return !!scrollMode; }, per: function () { return PER; }, gather: function () { return gather; } };
 })();

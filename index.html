@@ -128,8 +128,8 @@ html.veil .shade{opacity:.45;visibility:visible;transition-delay:0s,0s}
 .rings-l{left:calc(2% + 8px)}.rings-r{right:calc(2% + 8px)}
 .rings i,.drings i{position:absolute;top:0;border:3px solid;border-color:#EAD9AE #B3955C #8C7345 #D6C08A;border-radius:50%;box-sizing:border-box;box-shadow:0 0 0 1px rgba(255,248,230,.4),0 1px 2px rgba(0,0,0,.35),inset 0 0 0 1px rgba(255,255,255,.18)}
 .rings i{width:14px;height:14px;top:4px;transition:transform 1.6s var(--ease)}
-.rings-l i{left:calc((var(--i) + .25) * 20%);margin-left:-7px;transform:translateX(calc((var(--i) + .25) * (9.6cqw - 1.6px) * (var(--gather) - 1)))}
-.rings-r i{right:calc((var(--i) + .25) * 20%);margin-right:-7px;transform:translateX(calc((var(--i) + .25) * (9.6cqw - 1.6px) * (1 - var(--gather))))}
+.rings-l i{left:calc((var(--i) + .25) * 20%);margin-left:-7px;transform:translateX(calc((var(--i) + .25) * (9.6cqw - 1.6px) * (var(--gather) - 1) + 6px * (1 - var(--gather))))}
+.rings-r i{right:calc((var(--i) + .25) * 20%);margin-right:-7px;transform:translateX(calc((var(--i) + .25) * (9.6cqw - 1.6px) * (1 - var(--gather)) - 6px * (1 - var(--gather))))}
 html.veil .rings i{transform:translateX(0)}
 .panel{position:absolute;top:26px;bottom:0;width:calc(48% - 8px);transform:scaleX(var(--gather));transition:transform 1.6s var(--ease);
   background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,0) 30%,rgba(0,0,0,0) 70%,rgba(0,0,0,.1)),repeating-linear-gradient(90deg,var(--f1) 0,var(--f2) 2.5%,var(--f3) 4.9%,var(--f2) 7.5%,var(--f1) 10%);
@@ -140,7 +140,7 @@ html.veil .rings i{transform:translateX(0)}
 .panel-l{left:calc(2% + 8px);transform-origin:0 50%}
 .panel-r{right:calc(2% + 8px);transform-origin:100% 50%}
 html.veil .panel{transform:scaleX(1)}
-@media (max-width:700px){.rings i{width:10px;height:10px;border-width:2.5px;top:5px}.rings i:nth-child(n+4){display:none}.rings{top:8px;width:calc(48% - 6px)}.rings-l{left:calc(2% + 6px)}.rings-r{right:calc(2% + 6px)}.rings-l i{left:calc((var(--i) + .25) * 33.333%);margin-left:-5px;transform:translateX(calc((var(--i) + .25) * (16cqw - 2px) * (var(--gather) - 1)))}.rings-r i{right:calc((var(--i) + .25) * 33.333%);margin-right:-5px;transform:translateX(calc((var(--i) + .25) * (16cqw - 2px) * (1 - var(--gather))))}.rod{top:14px;height:6px}.fin{width:16px;height:16px;top:-5px}.fin-l{left:-10px}.fin-r{right:-10px}.panel{top:26px;width:calc(48% - 6px)}.panel-l{left:calc(2% + 6px)}.panel-r{right:calc(2% + 6px)}.hero-grid{padding-left:calc(2% + 24px + var(--gather) * (48% - 6px));padding-right:calc(2% + 24px + var(--gather) * (48% - 6px))}}
+@media (max-width:700px){.rings i{width:10px;height:10px;border-width:2.5px;top:5px}.rings i:nth-child(n+4){display:none}.rings{top:8px;width:calc(48% - 6px)}.rings-l{left:calc(2% + 6px)}.rings-r{right:calc(2% + 6px)}.rings-l i{left:calc((var(--i) + .25) * 33.333%);margin-left:-5px;transform:translateX(calc((var(--i) + .25) * (16cqw - 2px) * (var(--gather) - 1) + 4px * (1 - var(--gather))))}.rings-r i{right:calc((var(--i) + .25) * 33.333%);margin-right:-5px;transform:translateX(calc((var(--i) + .25) * (16cqw - 2px) * (1 - var(--gather)) - 4px * (1 - var(--gather))))}.rod{top:14px;height:6px}.fin{width:16px;height:16px;top:-5px}.fin-l{left:-10px}.fin-r{right:-10px}.panel{top:26px;width:calc(48% - 6px)}.panel-l{left:calc(2% + 6px)}.panel-r{right:calc(2% + 6px)}.hero-grid{padding-left:calc(2% + 24px + var(--gather) * (48% - 6px));padding-right:calc(2% + 24px + var(--gather) * (48% - 6px))}}
 
 /* ---------- sections ---------- */
 .sec{padding:clamp(64px,9vw,112px) 0}
@@ -183,8 +183,8 @@ html.veil .panel{transform:scaleX(1)}
 .drings-l{left:8%}.drings-r{right:8%}
 .drings{--rw:clamp(11px,2.4cqw,16px)}
 .drings i{width:var(--rw);height:var(--rw);transition:transform 1.1s var(--ease),opacity .3s ease}
-.drings-l i{left:calc((var(--i) + .25) * 25%);margin-left:calc(var(--rw) / -2);transform:translateX(calc((var(--i) + .25) * 11cqw * (var(--ds) - 1)))}
-.drings-r i{right:calc((var(--i) + .25) * 25%);margin-right:calc(var(--rw) / -2);transform:translateX(calc((var(--i) + .25) * 11cqw * (1 - var(--ds))))}
+.drings-l i{left:calc((var(--i) + .25) * 25%);margin-left:calc(var(--rw) / -2);transform:translateX(calc((var(--i) + .25) * 11cqw * (var(--ds) - 1) + 6px * (1 - var(--ds))))}
+.drings-r i{right:calc((var(--i) + .25) * 25%);margin-right:calc(var(--rw) / -2);transform:translateX(calc((var(--i) + .25) * 11cqw * (1 - var(--ds)) - 6px * (1 - var(--ds))))}
 .drape{position:absolute;top:calc(7% + 12px);bottom:5%;width:44%;z-index:3;transform:scaleX(var(--ds));transition:transform 1.1s var(--ease),clip-path .9s var(--ease),opacity .6s ease;box-shadow:0 0 30px rgba(12,24,18,.28)}
 .drape-l{left:8%;transform-origin:0 0;clip-path:polygon(0 0,100% 0,100% 15%,100% 30%,100% 45%,100% 58%,100% 63%,100% 72%,100% 85%,100% 100%,0 100%)}
 .drape-r{right:8%;transform-origin:100% 0;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,0 85%,0 72%,0 63%,0 58%,0 45%,0 30%,0 15%)}
@@ -379,7 +379,7 @@ html.gs .hero .glow{animation:none!important}
   <div class="wrap">
     <div class="sec-head">
       <h2>Paslaugos</h2>
-      <p class="sub">Spustelėkite paslaugą — langas parodys, kaip tai atrodo jūsų namuose.</p>
+      <p class="sub">Slinkite arba spustelėkite paslaugą — langas parodys, kaip tai atrodo jūsų namuose.</p>
     </div>
     <div class="demo s1" id="demo">
       <div class="demo-stage" aria-hidden="true">
