@@ -1,6 +1,6 @@
 /* IG užuolaidų salonas — judesys: užuolaidos atsiveria (GSAP laiko juosta), roletas leidžiasi pagal slinkimą
-   (ScrollTrigger scrub su išlyginimu), paslaugų langas keičia būsenas be trūkčiojimų (tween iš esamos padėties),
-   pats pereina per paslaugas, kol lankytojas nespustelėjo; nuotraukų peržiūra su priartinimu.
+   (ScrollTrigger scrub), paslaugų langas plačiame ekrane prisegamas ir keičia būsenas slenkant, telefone pats
+   pereina per paslaugas, kol nespustelėta; nuotraukų peržiūra per visą ekraną.
    Be GSAP arba su prefers-reduced-motion viskas lieka CSS: perėjimai arba iškart galutinė būsena. */
 (function () {
   'use strict';
@@ -12,22 +12,39 @@
   if (useG) html.classList.add('gs');
   var q = function (s, r) { return (r || document).querySelector(s); };
   var qa = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var visible = function (el) { return el.offsetParent !== null; };
 
-  /* Žiedų poslinkis: žiedai kabo ant klosčių viršūnių; suspaudus audinį iki s jie susislenka į krūvelę prie
-     išorinio krašto, bet ne arčiau nei 60 % žiedo skersmens vienas nuo kito – tada krūvelė lieka tvarkinga. */
+  /* Žiedų poslinkis: žiedai kabo ant klosčių viršūnių; suspaudus audinį iki s jie susirikiuoja į eilę prie
+     išorinio krašto ne arčiau kaip 85 % skersmens vienas nuo kito (kaip tikri žiedai ant karnizo). */
   function ringShift(rings, side, s) {
-    var box = rings[0].parentNode, W = box.clientWidth || 1, n = rings.length, period = 1 / n;
-    var gap = Math.max(s * period, 0.6 * rings[0].offsetWidth / W);
-    return function (i) {
-      var r = rings[i], c = (r.offsetLeft + r.offsetWidth / 2) / W;
-      if (side === 'r') c = 1 - c;
-      return (side === 'l' ? 1 : -1) * c * W * (gap / period - 1);
+    rings = rings.filter(visible);
+    if (!rings.length) return function () { return 0; };
+    var box = rings[0].parentNode, W = box.clientWidth || 1, n = rings.length, d = rings[0].offsetWidth;
+    var natural = s * W / n;                                 /* žiedų žingsnis, jei audinys tiesiog suspaustas iki s */
+    var gap = Math.max(natural, 0.85 * d);                   /* bet ne arčiau nei 85 % skersmens */
+    var pad = s < 0.98 ? (d < 12 ? 4 : 6) : 0;              /* suspausta eilė prasideda 4–6 px nuo išorinio krašto (už antgalio) */
+    return function (i, el) {
+      var r = el || rings[i], c = r.offsetLeft + r.offsetWidth / 2;
+      if (side === 'r') c = W - c;
+      var k = c / (W / n) - 0.25;                             /* žiedo eilės numeris pagal jo vietą ant klostės */
+      var target = pad + (k + 0.25) * gap;
+      return (side === 'l' ? 1 : -1) * (target - c);
     };
+  }
+  function gatherFor(panelW, rings) {                       /* skydo suspaudimas, kad žiedų eilė tilptų ant audinio */
+    rings = rings.filter(visible);
+    var d = rings.length ? rings[0].offsetWidth : 14;
+    return Math.min(0.22, Math.max(0.07, ((rings.length - 1) * 0.85 * d + d + (d < 12 ? 8 : 12)) / (panelW || 1)));
   }
 
   /* ---------- 1. Užuolaidos atsiveria ---------- */
   var hero = q('.hero');
-  var gather = parseFloat(getComputedStyle(html).getPropertyValue('--gather')) || 0.09;
+  var panels = qa('.panel'), rl = qa('.rings-l i'), rr = qa('.rings-r i');
+  var gather = parseFloat(getComputedStyle(html).getPropertyValue('--gather')) || 0.11;
+  if (panels.length) {
+    gather = gatherFor(panels[0].offsetWidth, rl);
+    html.style.setProperty('--gather', gather.toFixed(4));
+  }
   var opened = false;
 
   function openCurtains() {
@@ -35,7 +52,6 @@
     opened = true;
     if (!html.classList.contains('veil')) return;
     if (!useG) { html.classList.remove('veil'); return; }   /* CSS perėjimai */
-    var panels = qa('.panel'), rl = qa('.rings-l i'), rr = qa('.rings-r i');
     G.set(panels, { scaleX: 1 });
     G.set(rl.concat(rr), { x: 0 });
     G.set('.shade', { opacity: 0.45, visibility: 'visible' });
@@ -47,20 +63,13 @@
     var tl = G.timeline({ defaults: { ease: 'power3.inOut' }, onComplete: function () {
       G.set(panels, { clearProps: 'transform' });                 /* skydai toliau pagal CSS (--gather) */
       G.to('.hero .glow', { x: '-8%', y: '10%', duration: 16, yoyo: true, repeat: -1, ease: 'sine.inOut' });
-      var lastW = hero.clientWidth;
-      window.addEventListener('resize', function () {              /* žiedai laikomi px – perskaičiuojame keičiant plotį */
-        if (hero.clientWidth === lastW) return;
-        lastW = hero.clientWidth;
-        G.set(rl, { x: ringShift(rl, 'l', gather) });
-        G.set(rr, { x: ringShift(rr, 'r', gather) });
-      });
     } });
     tl.to('.rod .glint', { xPercent: 240, duration: 1.3, ease: 'power2.inOut' }, 0)
       .to('.shade', { opacity: 0, duration: 0.7, ease: 'power2.out' }, 0.05)
       .set('.shade', { visibility: 'hidden' })
       .to(panels, { scaleX: mid, duration: 1.35 }, 0.15)
-      .to(rl, { x: ringShift(rl, 'l', mid), duration: 1.35, stagger: { each: 0.025, from: 'end' } }, 0.15)
-      .to(rr, { x: ringShift(rr, 'r', mid), duration: 1.35, stagger: { each: 0.025, from: 'end' } }, 0.15)
+      .to(rl, { x: ringShift(rl, 'l', mid), duration: 1.35, stagger: { each: 0.03, from: 'end' } }, 0.15)
+      .to(rr, { x: ringShift(rr, 'r', mid), duration: 1.35, stagger: { each: 0.03, from: 'end' } }, 0.15)
       .to(panels, { scaleX: gather, duration: 0.45, ease: 'power2.out' }, 1.5)
       .to(rl, { x: ringShift(rl, 'l', gather), duration: 0.45, ease: 'power2.out' }, 1.5)
       .to(rr, { x: ringShift(rr, 'r', gather), duration: 0.45, ease: 'power2.out' }, 1.5)
@@ -75,6 +84,15 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(go);
     setTimeout(go, 900);                                     /* šriftams neatėjus – vis tiek atidarome */
   }
+  /* keičiant plotį: suspaudimas ir žiedai perskaičiuojami */
+  var lastHeroW = hero ? hero.clientWidth : 0;
+  window.addEventListener('resize', function () {
+    if (!hero || hero.clientWidth === lastHeroW || !panels.length) return;
+    lastHeroW = hero.clientWidth;
+    gather = gatherFor(panels[0].offsetWidth / (parseFloat(getComputedStyle(panels[0]).transform.split(',')[0].replace('matrix(', '')) || 1), rl);
+    html.style.setProperty('--gather', gather.toFixed(4));
+    if (useG && opened) { G.set(rl, { x: ringShift(rl, 'l', gather) }); G.set(rr, { x: ringShift(rr, 'r', gather) }); }
+  });
 
   /* ---------- 2. Roletas pirmame lange ---------- */
   var heroWindow = q('.hero-window');
@@ -83,7 +101,6 @@
     if (useG && ST) {
       G.set(heroCloth, { y: 0, yPercent: -100 });
       G.to(heroCloth, { yPercent: -14, ease: 'none', scrollTrigger: { trigger: hero, start: 'top 64px', end: '70% top', scrub: 0.8 } });
-      window.addEventListener('load', function () { ST.refresh(); });
     } else {
       var ticking = false;
       var updateBlind = function () {
@@ -102,7 +119,7 @@
   var cap = q('#demo-cap');
   var marker = q('.tab-marker');
   var current = 0;
-  var DS = { 1: 1, 2: 0.55, 3: 0.8, 4: 0.72, 5: 0.2, 6: 0.3 };
+  var DS = { 1: 1, 2: 0.55, 3: 0.8, 4: 0.72, 5: 0.24, 6: 0.3 };
   var CLIP = {
     l: 'polygon(0% 0%,100% 0%,100% 15%,100% 30%,100% 45%,100% 58%,100% 63%,100% 72%,100% 85%,100% 100%,0% 100%)',
     lTie: 'polygon(0% 0%,100% 0%,96% 15%,86% 30%,74% 45%,62% 58%,58% 63%,66% 72%,82% 85%,100% 100%,0% 100%)',
@@ -237,18 +254,38 @@
     moveMarker(tabs[i]);
   }
 
-  /* Savaiminis peržiūros ciklas: kol lankytojas nieko nespustelėjo ir skiltis matoma, langas pats pereina per paslaugas */
+  /* Plačiame ekrane skiltis prisegama: slenkant langas pats keičia paslaugas (po ~380 px kiekvienai) */
+  var PER = 380, scrollMode = null;
+  var paslaugos = q('#paslaugos');
+  if (useG && ST && paslaugos && tabs.length) {
+    G.matchMedia().add('(min-width: 900px)', function () {
+      scrollMode = ST.create({
+        trigger: paslaugos,
+        start: function () { return 'top ' + Math.max(64, Math.round((window.innerHeight - paslaugos.offsetHeight) / 2)) + 'px'; },
+        end: '+=' + (PER * tabs.length),
+        pin: true,
+        anticipatePin: 1,
+        onUpdate: function (self) {
+          var idx = Math.min(tabs.length - 1, Math.floor(self.progress * tabs.length + 0.0001));
+          if (idx !== current) select(idx, false);
+        }
+      });
+      return function () { if (scrollMode) { scrollMode.kill(); scrollMode = null; } };
+    });
+    window.addEventListener('load', function () { ST.refresh(); });
+  }
+
+  /* Telefone (be prisegimo): kol nespustelėta ir skiltis matoma, langas pats pereina per paslaugas */
   var tourTimer = null, interacted = false, sectionVisible = false;
   function stopTour() { interacted = true; clearTimeout(tourTimer); tourTimer = null; }
   function scheduleTour(delay) {
     clearTimeout(tourTimer);
-    if (interacted || !sectionVisible || reduce || document.hidden) return;
+    if (scrollMode || interacted || !sectionVisible || reduce || document.hidden) return;
     tourTimer = setTimeout(function () {
       select((current + 1) % tabs.length, false);
       scheduleTour(5200);
     }, delay);
   }
-  var paslaugos = q('#paslaugos');
   if (paslaugos && tabs.length && 'IntersectionObserver' in window) {
     new IntersectionObserver(function (entries) {
       sectionVisible = entries[0].isIntersecting;
@@ -257,14 +294,24 @@
     document.addEventListener('visibilitychange', function () { if (document.hidden) clearTimeout(tourTimer); else scheduleTour(2500); });
   }
 
+  function pick(i, focus) {                                  /* spustelėjus: prisegtoje skiltyje – peršokame į tos paslaugos vietą (be sklandaus slinkimo) */
+    stopTour();
+    if (scrollMode) {
+      var prev = html.style.scrollBehavior;
+      html.style.scrollBehavior = 'auto';
+      window.scrollTo(0, Math.round(scrollMode.start + i * PER + 4));
+      html.style.scrollBehavior = prev;
+    }
+    select(i, focus);
+  }
   tabs.forEach(function (b, i) {
-    b.addEventListener('click', function () { stopTour(); select(i, false); });
+    b.addEventListener('click', function () { pick(i, false); });
     b.addEventListener('keydown', function (e) {
       var k = e.key;
-      if (k === 'ArrowDown' || k === 'ArrowRight') { e.preventDefault(); stopTour(); select((i + 1) % tabs.length, true); }
-      else if (k === 'ArrowUp' || k === 'ArrowLeft') { e.preventDefault(); stopTour(); select((i - 1 + tabs.length) % tabs.length, true); }
-      else if (k === 'Home') { e.preventDefault(); stopTour(); select(0, true); }
-      else if (k === 'End') { e.preventDefault(); stopTour(); select(tabs.length - 1, true); }
+      if (k === 'ArrowDown' || k === 'ArrowRight') { e.preventDefault(); pick((i + 1) % tabs.length, true); }
+      else if (k === 'ArrowUp' || k === 'ArrowLeft') { e.preventDefault(); pick((i - 1 + tabs.length) % tabs.length, true); }
+      else if (k === 'Home') { e.preventDefault(); pick(0, true); }
+      else if (k === 'End') { e.preventDefault(); pick(tabs.length - 1, true); }
     });
   });
   if (tabs.length) {
@@ -285,21 +332,14 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { moveMarker(tabs[current]); });
   }
 
-  /* ---------- 4. Nuotraukų peržiūra su priartinimu ---------- */
+  /* ---------- 4. Nuotraukų peržiūra: visa nuotrauka ekrane, visas ekranas ---------- */
   var lb = q('#lb'), links = qa('.gal-link');
   if (lb && links.length && typeof lb.showModal === 'function') {
-    var lbImg = q('#lb-img'), lbFig = q('#lb-fig'), lbCap = q('#lb-cap'), lbCount = q('#lb-count'), lbHint = q('#lb-hint');
-    var idx = 0, zoomed = false, lastFocus = null;
-    function unzoom() {
-      zoomed = false;
-      lbFig.classList.remove('zoomed');
-      lbFig.style.width = lbFig.style.height = '';
-      lbImg.style.width = lbImg.style.height = '';
-      lbHint.textContent = 'Spustelėkite nuotrauką, kad priartintumėte';
-    }
+    var lbImg = q('#lb-img'), lbCap = q('#lb-cap'), lbCount = q('#lb-count'), fullBtn = q('.lb-full', lb);
+    var idx = 0, lastFocus = null;
+    if (!lb.requestFullscreen && !lb.webkitRequestFullscreen && fullBtn) fullBtn.hidden = true;
     function show(i) {
       idx = (i + links.length) % links.length;
-      unzoom();
       var a = links[idx], img = q('img', a), fc = q('figcaption', a.parentNode);
       lbImg.src = a.getAttribute('href');
       lbImg.alt = img ? img.alt : '';
@@ -313,30 +353,23 @@
       lb.showModal();
       q('.lb-close', lb).focus();
     }
-    function toggleZoom() {
-      if (zoomed) { unzoom(); return; }
-      var w = lbImg.clientWidth, h = lbImg.clientHeight;
-      if (!w || !h) return;
-      zoomed = true;
-      lbFig.style.width = w + 'px';
-      lbFig.style.height = h + 'px';
-      lbFig.classList.add('zoomed');
-      lbImg.style.width = Math.round(w * 2) + 'px';
-      lbImg.style.height = Math.round(h * 2) + 'px';
-      lbFig.scrollLeft = Math.round(w / 2);
-      lbFig.scrollTop = Math.round(h / 2);
-      lbHint.textContent = 'Slinkite, kad pamatytumėte detales; spustelėkite dar kartą, kad sumažintumėte';
+    function toggleFull() {
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      } else {
+        var req = lb.requestFullscreen || lb.webkitRequestFullscreen;
+        if (req) { try { var p = req.call(lb); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
+      }
     }
     links.forEach(function (a, i) { a.addEventListener('click', function (e) { e.preventDefault(); open(i); }); });
     lb.addEventListener('click', function (e) {
       var btn = e.target.closest('[data-lb]');
       if (btn) {
         var act = btn.getAttribute('data-lb');
-        if (act === 'close') lb.close(); else if (act === 'prev') show(idx - 1); else show(idx + 1);
+        if (act === 'close') lb.close(); else if (act === 'prev') show(idx - 1); else if (act === 'next') show(idx + 1); else if (act === 'full') toggleFull();
         return;
       }
-      if (e.target === lbImg) { toggleZoom(); return; }
-      if (e.target === lb) lb.close();                         /* fonas */
+      if (e.target === lb || e.target.classList.contains('lb-inner') || e.target.classList.contains('lb-fig')) lb.close();   /* fonas */
     });
     lb.addEventListener('keydown', function (e) {
       if (e.key === 'ArrowRight') { e.preventDefault(); show(idx + 1); }
@@ -344,11 +377,11 @@
     });
     lb.addEventListener('close', function () {
       html.classList.remove('lb-open');
-      unzoom();
+      if (document.fullscreenElement === lb && document.exitFullscreen) document.exitFullscreen().catch(function () {});
       if (lastFocus && lastFocus.focus) lastFocus.focus();
     });
   }
 
   /* API tikrinimui */
-  window.IG = { select: select, gsap: useG, state: function () { return demo ? demo.className : ''; }, tourActive: function () { return !interacted && !!tourTimer; } };
+  window.IG = { select: select, gsap: useG, state: function () { return demo ? demo.className : ''; }, tourActive: function () { return !interacted && !!tourTimer; }, scrollMode: function () { return !!scrollMode; }, gather: function () { return gather; } };
 })();
