@@ -277,6 +277,13 @@ html.veil .panel{transform:scaleX(1)}
 html.lb-open{overflow:hidden}
 @media (prefers-reduced-motion:reduce){.lb[open]{animation:none}.gal-link:hover img{transform:none}}
 .gallery figcaption{margin-top:8px;font-size:.88rem;color:var(--ink-2)}
+.extras{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media (min-width:760px){.extras{grid-template-columns:repeat(5,1fr);gap:16px}}
+.extra{margin:0}
+.extra img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:var(--r);background:var(--tint);transition:transform .35s var(--ease-out)}
+.extra figcaption{margin-top:10px}
+.extra figcaption b{display:block;font:600 1.15rem/1.15 var(--display);color:var(--ink)}
+.extra figcaption span{display:block;font-size:.88rem;color:var(--ink-2);margin-top:3px}
 
 /* contacts */
 .sec-dark{background:var(--velvet-2);color:#EEF3EF}
@@ -321,6 +328,7 @@ html.gs .hero .glow{animation:none!important}
       <a href="#paslaugos">Paslaugos</a>
       <a href="#kaip">Kaip vyksta</a>
       <a href="#darbai">Darbai</a>
+      <a href="#salone">Salone</a>
       <a href="#kontaktai">Kontaktai</a>
     </nav>
     <a class="btn btn-ghost btn-sm" href="tel:+37061207192" aria-label="Skambinti +370 612 07192">
@@ -446,17 +454,37 @@ html.gs .hero .glow{animation:none!important}
   <div class="wrap">
     <div class="sec-head">
       <h2>Salono darbai</h2>
-      <p class="sub">Nuotraukos iš IG užuolaidų salono kortelės info.lt.</p>
+      <p class="sub">Nuotraukos iš salono archyvo.</p>
     </div>
     <div class="gallery">
-      <figure><a class="gal-link" href="img/darbai-01.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-01.jpg" width="1024" height="768" alt="Šviesus kambarys su tiulio užuolaidomis" loading="lazy" decoding="async"></a><figcaption>Tiulis šviesiame kambaryje</figcaption></figure>
-      <figure><a class="gal-link" href="img/darbai-02.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-02.jpg" width="960" height="720" alt="Klostuotos užuolaidos su eglutės raštu" loading="lazy" decoding="async"></a><figcaption>Klostuotos užuolaidos</figcaption></figure>
-      <figure><a class="gal-link" href="img/darbai-03.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-03.jpg" width="750" height="1000" alt="Užuolaidos prie terasos durų" loading="lazy" decoding="async"></a><figcaption>Užuolaidos prie terasos durų</figcaption></figure>
-      <figure><a class="gal-link" href="img/darbai-04.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-04.jpg" width="960" height="720" alt="Rudos užuolaidos su parišimais ir tiuliu" loading="lazy" decoding="async"></a><figcaption>Užuolaidos su parišimais</figcaption></figure>
-      <figure><a class="gal-link" href="img/darbai-05.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-05.jpg" width="720" height="960" alt="Romanetė virš lango su dekoracijomis" loading="lazy" decoding="async"></a><figcaption>Romanetė virš lango</figcaption></figure>
-      <figure><a class="gal-link" href="img/darbai-06.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-06.jpg" width="720" height="960" alt="Kutai ir parišimai užuolaidoms" loading="lazy" decoding="async"></a><figcaption>Karnizų priedai ir parišimai</figcaption></figure>
-      <figure><a class="gal-link" href="img/darbai-07.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-07.jpg" width="720" height="960" alt="Tiulis su pomponų apdaila virtuvės lange" loading="lazy" decoding="async"></a><figcaption>Tiulis su apdaila</figcaption></figure>
-      <figure><a class="gal-link" href="img/darbai-08.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-08.jpg" width="850" height="850" alt="Užuolaidos lauko pavėsinėje" loading="lazy" decoding="async"></a><figcaption>Užuolaidos pavėsinėje</figcaption></figure>
+      <figure><a class="gal-link" href="img/darbai-01.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-01.jpg" width="1050" height="1400" alt="Užuolaidos ir tiulis svetainėje su valgomojo stalu" loading="lazy" decoding="async"></a><figcaption>Užuolaidos ir tiulis svetainėje</figcaption></figure>
+      <figure><a class="gal-link" href="img/darbai-02.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-02.jpg" width="1050" height="1400" alt="Pilkos užuolaidos su bangų klostėmis prie lango" loading="lazy" decoding="async"></a><figcaption>Pilkos užuolaidos su bangų klostėmis</figcaption></figure>
+      <figure><a class="gal-link" href="img/darbai-03.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-03.jpg" width="1050" height="1400" alt="Rudos užuolaidos ir baltas tiulis prie lango" loading="lazy" decoding="async"></a><figcaption>Užuolaidos ir tiulis prie lango</figcaption></figure>
+      <figure><a class="gal-link" href="img/darbai-04.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-04.jpg" width="1050" height="1400" alt="Pilkas tiulis, surištas segtuku" loading="lazy" decoding="async"></a><figcaption>Tiulis su parišimu</figcaption></figure>
+      <figure><a class="gal-link" href="img/darbai-05.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-05.jpg" width="1050" height="1400" alt="Užuolaidos ir tiulis miegamajame" loading="lazy" decoding="async"></a><figcaption>Užuolaidos miegamajame</figcaption></figure>
+      <figure><a class="gal-link" href="img/darbai-06.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-06.jpg" width="787" height="1400" alt="Tiulis su parišimu vakaro šviesoje" loading="lazy" decoding="async"></a><figcaption>Tiulis vakaro šviesoje</figcaption></figure>
+      <figure><a class="gal-link" href="img/darbai-07.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-07.jpg" width="1050" height="1400" alt="Pilkos užuolaidos miegamajame" loading="lazy" decoding="async"></a><figcaption>Pilkos užuolaidos miegamajame</figcaption></figure>
+      <figure><a class="gal-link" href="img/darbai-08.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-08.jpg" width="1050" height="1400" alt="Užuolaidos ir tiulis darbo kambaryje" loading="lazy" decoding="async"></a><figcaption>Užuolaidos darbo kambaryje</figcaption></figure>
+      <figure><a class="gal-link" href="img/darbai-09.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-09.jpg" width="787" height="1400" alt="Tiulis su lambrekenu valgomajame" loading="lazy" decoding="async"></a><figcaption>Tiulis su lambrekenu</figcaption></figure>
+      <figure><a class="gal-link" href="img/darbai-10.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-10.jpg" width="1400" height="1050" alt="Baltas tiulis su parišimu" loading="lazy" decoding="async"></a><figcaption>Tiulis su parišimu</figcaption></figure>
+      <figure><a class="gal-link" href="img/darbai-11.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-11.jpg" width="1050" height="1400" alt="Užuolaidos parišimas su kutu" loading="lazy" decoding="async"></a><figcaption>Parišimas su kutu</figcaption></figure>
+      <figure><a class="gal-link" href="img/darbai-12.jpg" aria-label="Padidinti nuotrauką"><img src="img/darbai-12.jpg" width="1050" height="1400" alt="Tiulis ir pilka užuolaida prie lango" loading="lazy" decoding="async"></a><figcaption>Tiulis ir užuolaida</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec-tint" id="salone">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Salone taip pat</h2>
+      <p class="sub">Be užuolaidų salone rasite audinius, pagalvėles, lovatieses ir Yodeyma kvepalus.</p>
+    </div>
+    <div class="extras">
+      <figure class="extra"><a class="gal-link" href="img/salone-audiniai.jpg" aria-label="Padidinti nuotrauką"><img src="img/salone-audiniai.jpg" width="900" height="1200" alt="Šviesus audinys su ornamentu" loading="lazy" decoding="async"></a><figcaption><b>Audiniai</b><span>Audiniai užuolaidoms salone</span></figcaption></figure>
+      <figure class="extra"><a class="gal-link" href="img/salone-pagalveles.jpg" aria-label="Padidinti nuotrauką"><img src="img/salone-pagalveles.jpg" width="900" height="1200" alt="Dekoratyvinės pagalvėlės su ornamentu" loading="lazy" decoding="async"></a><figcaption><b>Pagalvėlės</b><span>Prekiaujame pagalvėlėmis</span></figcaption></figure>
+      <figure class="extra"><a class="gal-link" href="img/salone-lovatieses.jpg" aria-label="Padidinti nuotrauką"><img src="img/salone-lovatieses.jpg" width="900" height="1200" alt="Lovatiesė ant lovos su dovanų juostele" loading="lazy" decoding="async"></a><figcaption><b>Lovatiesės</b><span>Lovatiesės ir patalynės komplektai</span></figcaption></figure>
+      <figure class="extra"><a class="gal-link" href="img/salone-kvepalai.jpg" aria-label="Padidinti nuotrauką"><img src="img/salone-kvepalai.jpg" width="1200" height="1200" alt="Yodeyma kvepalų stendas salone" loading="lazy" decoding="async"></a><figcaption><b>Yodeyma kvepalai</b><span>Vyrams, moterims ir vaikams: 15, 50 ir 100 ml</span></figcaption></figure>
+      <figure class="extra"><a class="gal-link" href="img/salone-dekoras.jpg" aria-label="Padidinti nuotrauką"><img src="img/salone-dekoras.jpg" width="1200" height="675" alt="Šviestuvo gaubtas su nėriniais" loading="lazy" decoding="async"></a><figcaption><b>Dekoro detalės</b><span>Šviestuvų gaubtai ir kitos dekoro detalės</span></figcaption></figure>
     </div>
   </div>
 </section>
