@@ -1,0 +1,35 @@
+/* theme.css — Ramūs atspalviai (šalavijas, linas, medus) */
+:root{
+  --linen:#F7F3EC;--paper:#FFFFFF;--ink:#33322C;--ink-2:#5F5C50;--line:#E7E1D5;--line-2:#F0EBE1;
+  --velvet:#5C7360;--velvet-2:#E9EFE6;--velvet-3:#5C7460;--tint:#E7EEE6;--tint-2:#F1F5EE;
+  --sun:#E4B95B;--sun-2:#E4B95B;--rod:#A6936F;--rod-2:#C6B695;--rod-3:#7C6C4E;
+  --f1:#8FA48B;--f2:#A3B69D;--f3:#B9C9AF;
+}
+/* --- хардкоды корня --- */
+.btn-sun:hover{background:#D8AC4C}
+.hdr{background:rgba(247,243,236,.88)}
+.hero{background:linear-gradient(180deg,#FAF7F0,#F1ECE0)}
+.shade{background:#55604F}
+.sunpatch{background:linear-gradient(90deg,rgba(228,185,91,.32),rgba(228,185,91,0))}
+.rings i,.drings i{border-color:#E8D9B4 #BCA878 #94825B #D8C894}
+.fin{background:radial-gradient(circle at 35% 35%,#E8D9B4,var(--rod) 55%,var(--rod-3))}
+.fv1{background:radial-gradient(circle at 35% 35%,#E8D9B4,var(--rod) 55%,var(--rod-3))}
+.fv2{background:linear-gradient(180deg,#DCCB9F,#9A895E)}
+.fv3{background:linear-gradient(135deg,#EFE7CF,#B5A273)}
+.fab2{--a:#7E93A8;--b:#94A9BC;--c:#AEC0CE}
+.fab3{--a:#C9BFA9;--b:#D9D0BE;--c:#E9E3D4}
+.fab4{--a:#B98E78;--b:#CBA491;--c:#DDBFB1}
+.swatches i:nth-child(2){background:#94A9BC}
+.swatches i:nth-child(3){background:#D9D0BE}
+.swatches i:nth-child(4){background:#CBA491}
+/* контакты: светлая секция в обоих вариантах */
+.sec-dark{background:#E9EFE6;color:#33322C}
+.sec-dark h2{color:#33322C}
+.sec-dark .sub{color:#5F5C50}
+.note{color:#5F5C50}
+.contact-list dt{color:#5F5C50}
+.contact-list a{color:#33322C}
+.sec-dark .btn-light{border-color:#E7E1D5;color:#33322C;background:rgba(255,255,255,.55)}
+.sec-dark .btn-light:hover{background:#fff;border-color:#5F5C50}
+a{color:#4E6651}
+a:focus-visible{outline-color:#E4B95B}

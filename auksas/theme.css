@@ -1,0 +1,35 @@
+/* theme.css — Auksiniai ir violetiniai akcentai (slyva, ametistas, auksas) */
+:root{
+  --linen:#F8F5F0;--paper:#FFFFFF;--ink:#2E2833;--ink-2:#625A6B;--line:#E6E0E9;--line-2:#F0ECF2;
+  --velvet:#5C3A6E;--velvet-2:#EFE8F3;--velvet-3:#6E4783;--tint:#EDE6F2;--tint-2:#F5F1F8;
+  --sun:#D9A441;--sun-2:#D9A441;--rod:#B08A3E;--rod-2:#D4B96E;--rod-3:#8A6D2C;
+  --f1:#4A2D5C;--f2:#5E3B72;--f3:#7A5390;
+}
+/* --- хардкоды корня --- */
+.btn-sun:hover{background:#C79339}
+.hdr{background:rgba(248,245,240,.88)}
+.hero{background:linear-gradient(180deg,#FAF7F2,#F1ECF2)}
+.shade{background:#2E2438}
+.sunpatch{background:linear-gradient(90deg,rgba(217,164,65,.32),rgba(217,164,65,0))}
+.rings i,.drings i{border-color:#EFD9A0 #C6A75C #9A7F3D #E2CB86}
+.fin{background:radial-gradient(circle at 35% 35%,#F0DCA8,var(--rod) 55%,var(--rod-3))}
+.fv1{background:radial-gradient(circle at 35% 35%,#F0DCA8,var(--rod) 55%,var(--rod-3))}
+.fv2{background:linear-gradient(180deg,#E0CB92,#9E8040)}
+.fv3{background:linear-gradient(135deg,#F2E6C8,#BFA05F)}
+.fab2{--a:#C9A961;--b:#DAC99B;--c:#EFE5C7}
+.fab3{--a:#9B86B0;--b:#B3A2C4;--c:#CDBFD9}
+.fab4{--a:#8C6B9E;--b:#A58AB5;--c:#BFA9CB}
+.swatches i:nth-child(2){background:#DAC99B}
+.swatches i:nth-child(3){background:#B3A2C4}
+.swatches i:nth-child(4){background:#A58AB5}
+/* контакты: светлая секция в обоих вариантах */
+.sec-dark{background:#EFE8F3;color:#2E2833}
+.sec-dark h2{color:#2E2833}
+.sec-dark .sub{color:#625A6B}
+.note{color:#625A6B}
+.contact-list dt{color:#625A6B}
+.contact-list a{color:#2E2833}
+.sec-dark .btn-light{border-color:#E6E0E9;color:#2E2833;background:rgba(255,255,255,.55)}
+.sec-dark .btn-light:hover{background:#fff;border-color:#625A6B}
+a{color:#553567}
+a:focus-visible{outline-color:#D9A441}
